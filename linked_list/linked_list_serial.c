@@ -48,14 +48,14 @@ bool Delete (LinkedList *list , int value){
     if(list->head==NULL){
         return false;
     }
-    if(list->head->data = value){
+    if(list->head->data == value){
         Node *temp = list->head;
         list->head = list->head->next;
         free(temp);
         return true;
     }
     Node *current = list->head;
-    while(current->next != NULL || current->next->data!=value){
+    while(current->next != NULL && current->next->data != value){
         current = current->next;
     }
     if(current->next != NULL){
@@ -64,17 +64,19 @@ bool Delete (LinkedList *list , int value){
         free(temp);
         return true;
     }
-
     return false;
 }
 
 // Print the linked list
 void printList(LinkedList *list){
-    Node* current = list->head;
-    while(current!=NULL){
-        printf("%d ->", current->data);
-        current= current->next;
+    if (list->head == NULL) {
+        printf("The list is empty.\n");
+        return;
     }
-    printf("NULL \n");
+    Node* current = list->head;
+    while(current != NULL){
+        printf("%d -> ", current->data);
+        current = current->next;
+    }
+    printf("NULL\n");
 }
-
