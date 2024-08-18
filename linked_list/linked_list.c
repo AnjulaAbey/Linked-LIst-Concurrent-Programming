@@ -3,26 +3,33 @@
 #include "linked_list.h"
 
 // initialize the linked list
-void initializeList(LinkedList *list) {
+void initializeList(LinkedList *list)
+{
     list->head = NULL;
 }
 
 // insert a new node with the given value
-bool Insert(LinkedList *list, int value) {
+bool Insert(LinkedList *list, int value)
+{
     Node *newNode = (Node *)malloc(sizeof(Node));
-    if (newNode == NULL) {
+    if (newNode == NULL)
+    {
         printf("Memory allocation failed\n");
         return false;
     }
     newNode->data = value;
     newNode->next = NULL;
 
-    if(list->head == NULL || list->head->data > value) {
+    if (list->head == NULL || list->head->data > value)
+    {
         newNode->next = list->head;
         list->head = newNode;
-    }else{
+    }
+    else
+    {
         Node *current = list->head;
-        while(current->next != NULL && current->next->data < value) {
+        while (current->next != NULL && current->next->data < value)
+        {
             current = current->next;
         }
         newNode->next = current->next;
@@ -32,10 +39,13 @@ bool Insert(LinkedList *list, int value) {
 }
 
 // search for a node with the given value
-bool Member(LinkedList *list, int value) {
+bool Member(LinkedList *list, int value)
+{
     Node *current = list->head;
-    while(current != NULL) {
-        if(current->data == value) {
+    while (current != NULL)
+    {
+        if (current->data == value)
+        {
             return true;
         }
         current = current->next;
@@ -44,21 +54,26 @@ bool Member(LinkedList *list, int value) {
 }
 
 // delete a node with the given value
-bool Delete (LinkedList *list , int value){
-    if(list->head==NULL){
+bool Delete(LinkedList *list, int value)
+{
+    if (list->head == NULL)
+    {
         return false;
     }
-    if(list->head->data == value){
+    if (list->head->data == value)
+    {
         Node *temp = list->head;
         list->head = list->head->next;
         free(temp);
         return true;
     }
     Node *current = list->head;
-    while(current->next != NULL && current->next->data != value){
+    while (current->next != NULL && current->next->data != value)
+    {
         current = current->next;
     }
-    if(current->next != NULL){
+    if (current->next != NULL)
+    {
         Node *temp = current->next;
         current->next = current->next->next;
         free(temp);
@@ -68,13 +83,16 @@ bool Delete (LinkedList *list , int value){
 }
 
 // Print the linked list
-void printList(LinkedList *list){
-    if (list->head == NULL) {
+void printList(LinkedList *list)
+{
+    if (list->head == NULL)
+    {
         printf("The list is empty.\n");
         return;
     }
-    Node* current = list->head;
-    while(current != NULL){
+    Node *current = list->head;
+    while (current != NULL)
+    {
         printf("%d -> ", current->data);
         current = current->next;
     }
