@@ -23,5 +23,6 @@ bool Insert(LinkedList *list, int value);
 bool Member(LinkedList *list, int value);
 bool Delete(LinkedList *list, int value);
 void PrintList(LinkedList *list);
+void FreeList(LinkedList *list);
 
 #endif

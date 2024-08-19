@@ -60,7 +60,6 @@ void calculateStats(double *cpu_time_list, int num_of_runs, double *mean, double
 
 int main(int argc, char *argv[])
 {
-
     if (argc != 8)
     {
         printf("Usage: %s <seed> <num_initializations> <num_threads> <num_member> <num_insert> <num_delete>\n", argv[0]);
@@ -88,8 +87,6 @@ int main(int argc, char *argv[])
     printf("Number of Insert Calls: %d\n", num_insert);
     printf("Number of Delete Calls: %d\n", num_delete);
 
-    LinkedList list;
-    initializeList(&list);
     // To measure time
     clock_t start, end;
     double cpu_time_used;
@@ -97,6 +94,9 @@ int main(int argc, char *argv[])
 
     for (int t = 0; t < num_of_runs; t++)
     {
+        LinkedList list;
+        initializeList(&list);
+
         // initialize all the unique values to initial insertion, and future insert functions
         int unique_vals[num_initializations + num_insert];
         generateUniqueRandomValues(unique_vals, (num_initializations + num_insert), 0, MAX_VAL);
@@ -114,8 +114,6 @@ int main(int argc, char *argv[])
         {
             Insert(&list, initial_values[i]);
         }
-        // printf("Initial Array : \n");
-        // printList(&list);
 
         // Start timing
         start = clock();
@@ -124,23 +122,19 @@ int main(int argc, char *argv[])
         for (int i = 0; i < num_member; i++)
         {
             bool isMember = Member(&list, member_values[i]);
-            // printf("Is %d in the list? %s\n", member_values[i], isMember ? "Yes" : "No");
         }
+
         // Insert
         for (int i = 0; i < num_insert; i++)
         {
             Insert(&list, insert_values[i]);
         }
-        // printf("After New Inserts Array : \n");
-        // printList(&list);
 
         // Delete a value
         for (int i = 0; i < num_delete; i++)
         {
             Delete(&list, delete_values[i]);
         }
-        // printf("After Deletes Array : \n");
-        // printList(&list);
 
         // End timing
         end = clock();
@@ -149,6 +143,9 @@ int main(int argc, char *argv[])
         cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
         printf("Total execution time: %f seconds\n", cpu_time_used);
         cpu_time_list[t] = cpu_time_used;
+
+        // Free the linked list memory
+        freeList(&list);
     }
 
     double mean = 0.0;
