@@ -2,3 +2,6 @@
 .vscode/*
 !.vscode/extensions.json
 .history
+
+combined_comparison.c
+combined_program.exe

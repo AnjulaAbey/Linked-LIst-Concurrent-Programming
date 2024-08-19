@@ -15,6 +15,9 @@ int *insert_values;
 int num_insert_per_thread;
 int *delete_values;
 int num_delete_per_thread;
+int num_member;             // Global variable for number of member operations
+int num_insert;             // Global variable for number of insert operations
+int num_delete;             // Global variable for number of delete operations
 pthread_mutex_t list_mutex; // Mutex for synchronizing access to the linked list
 
 // Function to check if a value already exists in the array
@@ -59,28 +62,48 @@ void *threadFunc(void *rank)
     int del_start = (my_rank * num_delete_per_thread);
     int del_end = (my_rank + 1) * num_delete_per_thread;
 
-    // Member operation
+    // // Print start and end values
+    // printf("Thread %ld:\n", my_rank);
+    // printf("  Member operations: start = %d, end = %d\n", mem_start, mem_end);
+    // printf("  Insert operations: start = %d, end = %d\n", ins_start, ins_end);
+    // printf("  Delete operations: start = %d, end = %d\n", del_start, del_end);
+
+    // Member operation (read)
     for (int i = mem_start; i < mem_end; i++)
     {
-        pthread_mutex_lock(&list_mutex);
-        Member(&list, member_values[i]);
-        pthread_mutex_unlock(&list_mutex);
+
+        if (i < num_member)
+        {
+            pthread_mutex_lock(&list_mutex);
+            // printf("Thread %ld: Checking member value: %d\n", my_rank, member_values[i]);
+            Member(&list, member_values[i]);
+            pthread_mutex_unlock(&list_mutex);
+        }
     }
 
     // Insert operation
     for (int i = ins_start; i < ins_end; i++)
     {
-        pthread_mutex_lock(&list_mutex);
-        Insert(&list, insert_values[i]);
-        pthread_mutex_unlock(&list_mutex);
+        if (i < num_insert)
+        {
+            pthread_mutex_lock(&list_mutex);
+            // printf("Thread %ld: Inserting value: %d\n", my_rank, insert_values[i]);
+            Insert(&list, insert_values[i]);
+            pthread_mutex_unlock(&list_mutex);
+        }
     }
 
     // Delete operation
     for (int i = del_start; i < del_end; i++)
     {
-        pthread_mutex_lock(&list_mutex);
-        Delete(&list, delete_values[i]);
-        pthread_mutex_unlock(&list_mutex);
+
+        if (i < num_delete)
+        {
+            pthread_mutex_lock(&list_mutex);
+            // printf("Thread %ld: Deleting value: %d\n", my_rank, delete_values[i]);
+            Delete(&list, delete_values[i]);
+            pthread_mutex_unlock(&list_mutex);
+        }
     }
 
     return NULL;
@@ -122,9 +145,9 @@ int main(int argc, char *argv[])
     double frac_insert = strtod(argv[6], NULL);
     double frac_delete = strtod(argv[7], NULL);
 
-    int num_member = (int)(m * frac_member);
-    int num_insert = (int)(m * frac_insert);
-    int num_delete = (int)(m * frac_delete);
+    num_member = (int)(m * frac_member);
+    num_insert = (int)(m * frac_insert);
+    num_delete = (int)(m * frac_delete);
 
     printf("Number of runs: %d\n", num_of_runs);
     printf("Number of Initializations: %d\n", num_initializations);
@@ -159,10 +182,17 @@ int main(int argc, char *argv[])
             Insert(&list, initial_values[i]);
         }
 
-        // Calculate operations per thread
-        num_member_per_thread = num_member / num_threads;
-        num_insert_per_thread = num_insert / num_threads;
-        num_delete_per_thread = num_delete / num_threads;
+        // Calculate operations per thread with ceiling
+        num_member_per_thread = (int)ceil((double)num_member / num_threads);
+        num_insert_per_thread = (int)ceil((double)num_insert / num_threads);
+        num_delete_per_thread = (int)ceil((double)num_delete / num_threads);
+
+        // // Print the calculated values
+        // printf("Operations per thread:\n");
+        // printf("Member operations per thread: %d\n", num_member_per_thread);
+        // printf("Insert operations per thread: %d\n", num_insert_per_thread);
+        // printf("Delete operations per thread: %d\n", num_delete_per_thread);
+        // PrintList(&list);
 
         start = clock();
 
