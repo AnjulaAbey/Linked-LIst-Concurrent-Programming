@@ -7,20 +7,15 @@
 
 #define MAX_VAL 65535 // 2^16 - 1
 
-// Mutex for synchronizing access to the linked list
-pthread_mutex_t list_mutex;
-
-// Thread argument structure
-typedef struct
-{
-    LinkedList *list;
-    int *member_values;
-    int num_member;
-    int *insert_values;
-    int num_insert;
-    int *delete_values;
-    int num_delete;
-} ThreadArgs;
+// Global variables
+LinkedList list;
+int *member_values;
+int num_member_per_thread;
+int *insert_values;
+int num_insert_per_thread;
+int *delete_values;
+int num_delete_per_thread;
+pthread_mutex_t list_mutex; // Mutex for synchronizing access to the linked list
 
 // Function to check if a value already exists in the array
 bool isUnique(int *arr, int size, int value)
@@ -51,31 +46,40 @@ void generateUniqueRandomValues(int *arr, int n, int min_val, int max_val)
 }
 
 // Thread function for parallel operations
-void *threadFunc(void *args)
+void *threadFunc(void *rank)
 {
-    ThreadArgs *thread_args = (ThreadArgs *)args;
+    long my_rank = (long)rank;
+
+    int mem_start = (my_rank * num_member_per_thread);
+    int mem_end = (my_rank + 1) * num_member_per_thread;
+
+    int ins_start = (my_rank * num_insert_per_thread);
+    int ins_end = (my_rank + 1) * num_insert_per_thread;
+
+    int del_start = (my_rank * num_delete_per_thread);
+    int del_end = (my_rank + 1) * num_delete_per_thread;
 
     // Member operation
-    for (int i = 0; i < thread_args->num_member; i++)
+    for (int i = mem_start; i < mem_end; i++)
     {
         pthread_mutex_lock(&list_mutex);
-        Member(thread_args->list, thread_args->member_values[i]);
+        Member(&list, member_values[i]);
         pthread_mutex_unlock(&list_mutex);
     }
 
     // Insert operation
-    for (int i = 0; i < thread_args->num_insert; i++)
+    for (int i = ins_start; i < ins_end; i++)
     {
         pthread_mutex_lock(&list_mutex);
-        Insert(thread_args->list, thread_args->insert_values[i]);
+        Insert(&list, insert_values[i]);
         pthread_mutex_unlock(&list_mutex);
     }
 
     // Delete operation
-    for (int i = 0; i < thread_args->num_delete; i++)
+    for (int i = del_start; i < del_end; i++)
     {
         pthread_mutex_lock(&list_mutex);
-        Delete(thread_args->list, thread_args->delete_values[i]);
+        Delete(&list, delete_values[i]);
         pthread_mutex_unlock(&list_mutex);
     }
 
@@ -131,10 +135,7 @@ int main(int argc, char *argv[])
     printf("Number of Delete Calls: %d\n", num_delete);
 
     pthread_t threads[num_threads];
-    ThreadArgs thread_args[num_threads];
-    LinkedList list;
 
-    initializeList(&list);
     pthread_mutex_init(&list_mutex, NULL);
 
     clock_t start, end;
@@ -147,10 +148,10 @@ int main(int argc, char *argv[])
         generateUniqueRandomValues(unique_vals, (num_initializations + num_insert), 0, MAX_VAL);
 
         int *initial_values = unique_vals;
-        int *insert_values = unique_vals + num_initializations;
-        int member_values[num_member];
+        insert_values = unique_vals + num_initializations;
+        member_values = (int *)malloc(num_member * sizeof(int));
         generateUniqueRandomValues(member_values, num_member, 0, MAX_VAL);
-        int delete_values[num_delete];
+        delete_values = (int *)malloc(num_delete * sizeof(int));
         generateUniqueRandomValues(delete_values, num_delete, 0, MAX_VAL);
 
         for (int i = 0; i < num_initializations; i++)
@@ -158,19 +159,16 @@ int main(int argc, char *argv[])
             Insert(&list, initial_values[i]);
         }
 
+        // Calculate operations per thread
+        num_member_per_thread = num_member / num_threads;
+        num_insert_per_thread = num_insert / num_threads;
+        num_delete_per_thread = num_delete / num_threads;
+
         start = clock();
 
         for (int i = 0; i < num_threads; i++)
         {
-            thread_args[i].list = &list;
-            thread_args[i].member_values = member_values;
-            thread_args[i].num_member = num_member / num_threads;
-            thread_args[i].insert_values = insert_values;
-            thread_args[i].num_insert = num_insert / num_threads;
-            thread_args[i].delete_values = delete_values;
-            thread_args[i].num_delete = num_delete / num_threads;
-
-            pthread_create(&threads[i], NULL, threadFunc, &thread_args[i]);
+            pthread_create(&threads[i], NULL, threadFunc, (void *)i);
         }
 
         for (int i = 0; i < num_threads; i++)
@@ -183,6 +181,11 @@ int main(int argc, char *argv[])
         cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
         printf("Total execution time: %f seconds\n", cpu_time_used);
         cpu_time_list[t] = cpu_time_used;
+
+        // PrintList(&list);
+
+        // Free the linked list memory
+        FreeList(&list);
     }
 
     double mean = 0.0;
@@ -194,6 +197,9 @@ int main(int argc, char *argv[])
     printf("Standard Deviation: %f\n", std_dev);
 
     pthread_mutex_destroy(&list_mutex);
+
+    free(member_values);
+    free(delete_values);
 
     return 0;
 }

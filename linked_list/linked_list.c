@@ -83,7 +83,7 @@ bool Delete(LinkedList *list, int value)
 }
 
 // Print the linked list
-void printList(LinkedList *list)
+void PrintList(LinkedList *list)
 {
     if (list->head == NULL)
     {
@@ -99,16 +99,17 @@ void printList(LinkedList *list)
     printf("NULL\n");
 }
 
-void freeList(LinkedList *list) {
+void FreeList(LinkedList *list)
+{
     Node *current = list->head;
     Node *next;
-    
-    while (current != NULL) {
+
+    while (current != NULL)
+    {
         next = current->next;
         free(current);
         current = next;
     }
-    
+
     list->head = NULL;
 }
- 
