@@ -223,6 +223,7 @@ int main(int argc, char *argv[])
 
     // printf("Mean (Average): %f\n", mean);
     // printf("Standard Deviation: %f\n", std_dev);
+    printf("%d, %.6f, %.6f\n", num_threads, mean, std_dev);
 
     // Destroy the read-write lock
     pthread_rwlock_destroy(&list_rwlock);
