@@ -5,7 +5,11 @@
 #include "linked_list/linked_list.h"
 
 #define MAX_VAL 65535 // 2^16 - 1
-
+double calculateConfidenceInterval(double mean, double std_dev, int num_of_runs)
+{
+    double z = 1.96;  // For 95% confidence level
+    return z * (std_dev / sqrt(num_of_runs));
+}
 // Function to check if a value already exists in the array
 bool isUnique(int *arr, int size, int value)
 {
@@ -153,10 +157,24 @@ int main(int argc, char *argv[])
 
     // Calculate mean and standard deviation
     calculateStats(cpu_time_list, num_of_runs, &mean, &std_dev);
+    // Calculate 95% confidence interval
+    double confidence_interval = calculateConfidenceInterval(mean, std_dev, num_of_runs);
 
     // Print the results
     // printf("Mean (Average): %f\n", mean);
     // printf("Standard Deviation: %f\n", std_dev);
     printf("%d, %.6f, %.6f\n", num_threads, mean, std_dev);
+    printf("95%% confidence interval: %f ± %f seconds\n", mean, confidence_interval);
+
+    // Check if the margin of error is within ±5%
+    double margin_of_error = confidence_interval / mean;
+    if (margin_of_error <= 0.05)
+    {
+        printf("The results are accurate within ±5%% margin.\n");
+    }
+    else
+    {
+        printf("The margin of error is greater than ±5%%. More runs may be needed.\n");
+    }
     return 0;
 }
