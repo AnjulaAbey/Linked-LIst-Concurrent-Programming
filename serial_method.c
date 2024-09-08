@@ -79,13 +79,13 @@ int main(int argc, char *argv[])
     int num_delete = (int)(m * frac_delete);
 
     // Debug output to verify inputs
-    printf("Number of runs: %d\n", num_of_runs);
-    printf("Number of Initializations: %d\n", num_initializations);
-    printf("Number of Threads: %d\n", num_threads);
-    printf("Number of m: %d\n", m);
-    printf("Number of Member Calls: %d\n", num_member);
-    printf("Number of Insert Calls: %d\n", num_insert);
-    printf("Number of Delete Calls: %d\n", num_delete);
+    // printf("Number of runs: %d\n", num_of_runs);
+    // printf("Number of Initializations: %d\n", num_initializations);
+    // printf("Number of Threads: %d\n", num_threads);
+    // printf("Number of m: %d\n", m);
+    // printf("Number of Member Calls: %d\n", num_member);
+    // printf("Number of Insert Calls: %d\n", num_insert);
+    // printf("Number of Delete Calls: %d\n", num_delete);
 
     // To measure time
     clock_t start, end;
@@ -141,11 +141,11 @@ int main(int argc, char *argv[])
 
         // Calculate total time taken
         cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-        printf("Total execution time: %f seconds\n", cpu_time_used);
+        // printf("Total execution time: %f seconds\n", cpu_time_used);
         cpu_time_list[t] = cpu_time_used;
 
         // Free the linked list memory
-        freeList(&list);
+        FreeList(&list);
     }
 
     double mean = 0.0;
@@ -155,8 +155,8 @@ int main(int argc, char *argv[])
     calculateStats(cpu_time_list, num_of_runs, &mean, &std_dev);
 
     // Print the results
-    printf("Mean (Average): %f\n", mean);
-    printf("Standard Deviation: %f\n", std_dev);
-
+    // printf("Mean (Average): %f\n", mean);
+    // printf("Standard Deviation: %f\n", std_dev);
+    printf("%d, %.6f, %.6f\n", num_threads, mean, std_dev);
     return 0;
 }

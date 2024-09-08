@@ -149,13 +149,13 @@ int main(int argc, char *argv[])
     num_insert = (int)(m * frac_insert);
     num_delete = (int)(m * frac_delete);
 
-    printf("Number of runs: %d\n", num_of_runs);
-    printf("Number of Initializations: %d\n", num_initializations);
-    printf("Number of Threads: %d\n", num_threads);
-    printf("Number of m: %d\n", m);
-    printf("Number of Member Calls: %d\n", num_member);
-    printf("Number of Insert Calls: %d\n", num_insert);
-    printf("Number of Delete Calls: %d\n", num_delete);
+    // printf("Number of runs: %d\n", num_of_runs);
+    // printf("Number of Initializations: %d\n", num_initializations);
+    // printf("Number of Threads: %d\n", num_threads);
+    // printf("Number of m: %d\n", m);
+    // printf("Number of Member Calls: %d\n", num_member);
+    // printf("Number of Insert Calls: %d\n", num_insert);
+    // printf("Number of Delete Calls: %d\n", num_delete);
 
     pthread_t threads[num_threads];
 
@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
         end = clock();
 
         cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-        printf("Total execution time: %f seconds\n", cpu_time_used);
+        // printf("Total execution time: %f seconds\n", cpu_time_used);
         cpu_time_list[t] = cpu_time_used;
 
         // PrintList(&list);
@@ -223,8 +223,9 @@ int main(int argc, char *argv[])
 
     calculateStats(cpu_time_list, num_of_runs, &mean, &std_dev);
 
-    printf("Mean (Average): %f\n", mean);
-    printf("Standard Deviation: %f\n", std_dev);
+    // printf("Mean (Average): %f\n", mean);
+    // printf("Standard Deviation: %f\n", std_dev);
+    printf("%d, %.6f, %.6f\n", num_threads, mean, std_dev);
 
     pthread_mutex_destroy(&list_mutex);
 
